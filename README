@@ -1,0 +1,13 @@
+EXAMPLE USAGE
+=============
+
+Zimbra.url = 'http://example.com:7071/soap/service'
+Zimbra.login('admin@example.com','secret')
+
+d = Zimbra::Domain.create('luser.com')
+
+dl = Zimbra::DistributionList.create('info@luser.com')
+dl.admin_group = true
+dl.save
+
+
