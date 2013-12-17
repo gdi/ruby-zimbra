@@ -43,7 +43,7 @@ module Zimbra
   
   module HandsoapUriOverrides
     def uri
-      Zimbra.url
+      Zimbra.admin_api_url
     end
     def envelope_namespace
       'http://www.w3.org/2003/05/soap-envelope'
