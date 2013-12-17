@@ -1,7 +1,7 @@
 EXAMPLE USAGE
 =============
 
-Zimbra.url = 'http://example.com:7071/soap/service'
+Zimbra.url = 'https://mail.server.test:7071/service/admin/soap'
 Zimbra.login('admin@example.com','secret')
 
 d = Zimbra::Domain.create('luser.com')
