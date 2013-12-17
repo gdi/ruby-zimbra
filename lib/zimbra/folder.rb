@@ -10,14 +10,25 @@ module Zimbra
         FolderService.find_all_by_view(view)
       end
     end
-
-    attr_accessor :id, :uuid, :name, :absolute_folder_path
+    
+    ATTRS = [
+      :id, :uuid, :name, :view, :absolute_folder_path,
+      :parent_folder_id, :parent_folder_uuid,
+      :non_folder_item_count, :non_folder_item_size,
+      :revision, :imap_next_uid, :imap_modified_sequence, :modified_sequence, :activesync_disabled,
+      :modified_date
+    ] unless const_defined?(:ATTRS)
+    
+    attr_accessor *ATTRS
     
     def initialize(args = {})
-      self.id = args[:id]
-      self.uuid = args[:uuid]
-      self.name = args[:name]
-      self.absolute_folder_path = args[:absolute_folder_path]
+      self.attributes = args
+    end
+    
+    def attributes=(args = {})
+      ATTRS.each do |attr_name|
+        self.send(:"#{attr_name}=", (args[attr_name] || args[attr_name.to_s])) if args.has_key?(attr_name) || args.has_key?(attr_name.to_s)
+      end
     end
   end
   
@@ -43,6 +54,24 @@ module Zimbra
     end
     
     class Parser
+      ATTRIBUTE_MAPPING = {
+        :id => :id, 
+        :uuid => :uuid, 
+        :name => :name, 
+        :view => :view, 
+        :absFolderPath => :absolute_folder_path, 
+        :l => :parent_folder_id, 
+        :luuid => :parent_folder_uuid, 
+        :n => :non_folder_item_count, 
+        :s => :non_folder_item_size, 
+        :rev => :revision, 
+        :i4next => :imap_next_uid, 
+        :i4ms => :imap_modified_sequence, 
+        :ms => :modified_sequence, 
+        :activesyncdisabled => :activesync_disabled, 
+        :md => :modified_date
+      }
+      
       class << self
         def get_all_response(response)
           (response/"//n2:folder").map do |node|
@@ -51,11 +80,11 @@ module Zimbra
         end
 
         def folder_response(node)
-          id = (node/'@id').to_s
-          uuid = (node/'@uuid').to_s
-          name = (node/'@name').to_s
-          absolute_folder_path = (node/'@absFolderPath').to_s
-          Zimbra::Folder.new(id: id, uuid: uuid, name: name, absolute_folder_path: absolute_folder_path) 
+          folder_attributes = ATTRIBUTE_MAPPING.inject({}) do |attrs, (xml_name, attr_name)|
+            attrs[attr_name] = (node/"@#{xml_name}").to_s
+            attrs
+          end
+          Zimbra::Folder.new(folder_attributes) 
         end
       end
     end
