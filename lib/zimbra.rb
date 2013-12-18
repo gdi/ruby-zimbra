@@ -10,6 +10,7 @@ require 'zimbra/acl'
 require 'zimbra/common_elements'
 require 'zimbra/delegate_auth_token'
 require 'zimbra/folder'
+require 'zimbra/appointment'
 
 # Manages a Zimbra SOAP session.  Offers ability to set the endpoint URL, log in, and enable debugging.
 module Zimbra
