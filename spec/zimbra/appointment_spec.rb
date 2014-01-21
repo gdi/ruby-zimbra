@@ -2,6 +2,18 @@ require File.join(File.dirname(__FILE__),'../spec_helper')
 require 'json'
 
 describe Zimbra::Appointment do
+  describe ".parse_zimbra_attributes" do
+    before do
+      @xml_api_responses_path = File.join(@fixture_path, 'xml_api_responses', 'recur_rules')
+      xml = File.read(File.join(@xml_api_responses_path, 'second_wednesday_of_every_month.xml'))
+      @appointment_hash = Zimbra::Hash.from_xml(xml)
+    end
+    
+    it "should return all the attributes" do
+      Zimbra::Appointment.parse_zimbra_attributes(@appointment_hash).should == {:id=>518, :uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :revision=>27656, :calendar_id=>10, :size=>0, :fragment=>nil, :description=>nil, :alarm=>{:attributes=>{:action=>"DISPLAY"}, :trigger=>{:rel=>{:attributes=>{:neg=>1, :m=>5, :related=>"START"}}}, :desc=>{}}, :recurrence_rule=>{:add=>{:rule=>{:attributes=>{:freq=>"MON"}, :interval=>{:attributes=>{:ival=>1}}, :byday=>{:wkday=>{:attributes=>{:ordwk=>2, :day=>"WE"}}}}}}, :attendees=>nil, :organizer_email_address=>"mail03@greenviewdata.com", :name=>"Test2222", :computed_free_busy_status=>"B", :free_busy_setting=>"B", :date=>1387571704000, :invite_status=>"CONF", :all_day=>nil, :visibility=>"PUB", :location=>"", :transparency=>"O", :is_organizer=>1}
+    end
+  end
+  
   describe "#recurrence_rule" do
     before do
       @xml_api_responses_path = File.join(@fixture_path, 'xml_api_responses', 'recur_rules')
