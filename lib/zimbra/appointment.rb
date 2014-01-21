@@ -8,10 +8,12 @@ module Zimbra
     autoload :Alarm, 'zimbra/appointment/alarm'
     autoload :Attendee, 'zimbra/appointment/attendee'
     autoload :Reply, 'zimbra/appointment/reply'
+    autoload :Invite, 'zimbra/appointment/invite'
+    autoload :RecurException, 'zimbra/appointment/recur_exception'
     
     class << self
       def find_all_by_calendar_id(calendar_id)
-        AppointmentService.find_all_by_calendar_id(calendar_id).collect { |attrs| new_from_zimbra_attributes(attrs) }
+        AppointmentService.find_all_by_calendar_id(calendar_id).collect { |attrs| new_from_zimbra_attributes(attrs.merge(:loaded_from_search => true)) }
       end
       
       def find(appointment_id)
@@ -19,68 +21,40 @@ module Zimbra
       end
       
       def new_from_zimbra_attributes(zimbra_attributes)
+        puts "parsing: #{zimbra_attributes.inspect}"
         new(parse_zimbra_attributes(zimbra_attributes))
       end
       
       def parse_zimbra_attributes(zimbra_attributes)
         zimbra_attributes = Zimbra::Hash.symbolize_keys(zimbra_attributes.dup, true)
-      
-        attrs = {}
         
-        return attrs unless zimbra_attributes.has_key?(:appt) && zimbra_attributes[:appt].has_key?(:attributes)
+        return {} unless zimbra_attributes.has_key?(:appt) && zimbra_attributes[:appt].has_key?(:attributes)
         
-        attrs.merge!({
+        {
           :id                        => zimbra_attributes[:appt][:attributes][:id],
           :uid                       => zimbra_attributes[:appt][:attributes][:uid],
           :revision                  => zimbra_attributes[:appt][:attributes][:rev],
           :calendar_id               => zimbra_attributes[:appt][:attributes][:l],
           :size                      => zimbra_attributes[:appt][:attributes][:s],
-          })
-        
-        attrs[:replies] = zimbra_attributes[:appt][:replies] if zimbra_attributes[:appt].has_key?(:replies)
-        
-        return attrs unless zimbra_attributes[:appt].has_key?(:inv) && zimbra_attributes[:appt][:inv].has_key?(:comp)
-        
-        attrs.merge!({
-          :fragment                  => zimbra_attributes[:appt][:inv][:comp][:fr],
-          :description               => zimbra_attributes[:appt][:inv][:comp][:desc],
-          :alarm                     => zimbra_attributes[:appt][:inv][:comp][:alarm],
-          :recurrence_rule           => zimbra_attributes[:appt][:inv][:comp][:recur],
-          :attendees                 => zimbra_attributes[:appt][:inv][:comp][:at]
-          })
-        
-        attrs[:organizer_email_address] = zimbra_attributes[:appt][:inv][:comp][:or][:attributes][:a] rescue nil
-        
-        return attrs unless zimbra_attributes[:appt][:inv][:comp].has_key?(:attributes)
-        
-        attrs.merge!({
-          :name                      => zimbra_attributes[:appt][:inv][:comp][:attributes][:name],
-          :computed_free_busy_status => zimbra_attributes[:appt][:inv][:comp][:attributes][:fba],
-          :free_busy_setting         => zimbra_attributes[:appt][:inv][:comp][:attributes][:fb],
-          :date                      => zimbra_attributes[:appt][:inv][:comp][:attributes][:d],
-          :invite_status             => zimbra_attributes[:appt][:inv][:comp][:attributes][:status],
-          :all_day                   => zimbra_attributes[:appt][:inv][:comp][:attributes][:allDay],
-          :visibility                => zimbra_attributes[:appt][:inv][:comp][:attributes][:class],
-          :location                  => zimbra_attributes[:appt][:inv][:comp][:attributes][:loc],
-          :transparency              => zimbra_attributes[:appt][:inv][:comp][:attributes][:transp],
-          :is_organizer              => zimbra_attributes[:appt][:inv][:comp][:attributes][:isOrg]
-          })
-          
-        attrs
+          :replies                   => zimbra_attributes[:appt][:replies],
+          :invites                   => zimbra_attributes[:appt][:inv],
+          :date                      => zimbra_attributes[:appt][:attributes][:d],
+          :loaded_from_search        => zimbra_attributes[:loaded_from_search]
+        }
       end
     end
     
     ATTRS = [
-      :id, :uid, :name, :fragment, :description, :alarm, :recurrence_rule, :attendees, 
-      :organizer_email_address, :is_organizer, :revision, :computed_free_busy_status,
-      :free_busy_setting, :date, :invite_status, :all_day, :visibility, :location, 
-      :calendar_id, :size, :transparency, :replies
+      :id, :uid, :date, :revision, :size, :calendar_id, 
+      :replies, :invites
     ] unless const_defined?(:ATTRS)
     
     attr_accessor *ATTRS
+    attr_reader :loaded_from_search
     
     def initialize(args = {})
       self.attributes = args
+      @loaded_from_search = args[:loaded_from_search] || false
     end
     
     def attributes=(args = {})
@@ -89,19 +63,18 @@ module Zimbra
       end
     end
     
+    def reload
+      self.attributes = Zimbra::Appointment.parse_zimbra_attributes(AppointmentService.find(id))
+      @loaded_from_search = false
+    end
+    
     def destroy
       # zmsoap -vv -z -m mail03@greenviewdata.com CancelAppointmentRequest @id="498-497" @comp=0
     end
     
-    def recurrence_rule=(recur_rule_attributes)
-      @recurrence_rule = Zimbra::Appointment::RecurRule.new_from_zimbra_attributes(recur_rule_attributes)
-    end
-    
-    def attendees=(attendees_attributes)
-      return @attendees = [] unless attendees_attributes
-      
-      attendees_attributes = attendees_attributes.is_a?(Array) ? attendees_attributes : [attendees_attributes]
-      @attendees = attendees_attributes.collect { |attrs| Zimbra::Appointment::Attendee.new_from_zimbra_attributes(attrs[:attributes]) }
+    def replies
+      reload if loaded_from_search
+      @replies
     end
     
     def replies=(replies_attributes)
@@ -111,18 +84,18 @@ module Zimbra
       @replies = replies_attributes.collect { |attrs| Zimbra::Appointment::Reply.new_from_zimbra_attributes(attrs[:attributes]) }
     end
     
-    def alarm=(alarm_attributes)
-      @alarm = alarm_attributes ? Zimbra::Appointment::Alarm.new_from_zimbra_attributes(alarm_attributes) : nil
+    def invites
+      reload if loaded_from_search
+      @invites
     end
     
-    def computed_free_busy_status=(val)
-      @computed_free_busy_status = parse_free_busy_status(val)
+    def invites=(invites_attributes)
+      return @invites = nil unless invites_attributes
+      
+      invites_attributes = invites_attributes.is_a?(Array) ? invites_attributes : [ invites_attributes ]
+      @invites = invites_attributes.collect { |attrs| Zimbra::Appointment::Invite.new_from_zimbra_attributes(attrs) }
     end
-    
-    def free_busy_setting=(val)
-      @free_busy_setting = parse_free_busy_status(val)
-    end
-    
+  
     def date=(val)
       if val.is_a?(Integer)
         @date = parse_date_in_seconds(val)
@@ -131,81 +104,12 @@ module Zimbra
       end
     end
     
-    def invite_status=(val)
-      @invite_status = parse_invite_status(val)
-    end
-    
-    def visibility=(val)
-      @visibility = parse_visibility_status(val)
-    end
-    
-    def transparency=(val)
-      @transparency = parse_transparency_status(val)
-    end
-    
-    def all_day=(val)
-      @all_day = parse_all_day(val)
-    end
-    
     private
-    
-    def parse_all_day(val)
-      possible_values = {
-        0 => false,
-        1 => true,
-        '0' => false,
-        '1' => true
-      }
-      possible_values[val] || val
-    end
-    
-    def parse_free_busy_status(fb_status)
-      possible_values = {
-        'F' => :free,
-        'B' => :busy,
-        'T' => :busy_tentative,
-        'U' => :busy_unavailable
-      }
-      possible_values[fb_status] || fb_status
-    end
     
     def parse_date_in_seconds(seconds)
       Time.at(seconds / 1000)
     end
     
-    def parse_invite_status(status)
-      possible_values = {
-        'TENT' => :tentative,
-        'CONF' => :confirmed,
-        'CANC' => :canceled,
-        'NEED' => :need, # Not sure about this one, it's not documented
-        'COMP' => :completed,
-        'INPR' => :in_progress,
-        'WAITING' => :waiting,
-        'DEFERRED' => :deferred
-      }
-      
-      possible_values[status] || status
-    end
-    
-    def parse_visibility_status(status)
-      possible_values = {
-        'PUB' => :public,
-        'PRI' => :private,
-        'CON' => :confidential
-      }
-      
-      possible_values[status] || status
-    end
-    
-    def parse_transparency_status(status)
-      possible_values = {
-        'O' => :opaque,
-        'T' => :transparent
-      }
-      
-      possible_values[status] || status
-    end
   end
   
   class AppointmentService < HandsoapAccountService

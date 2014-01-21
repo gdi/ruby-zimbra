@@ -1,0 +1,109 @@
+  <appt uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" id="400" rev="27783" nextAlarm="1387806900000" d="1390321021000" s="0" l="10">
+    <inv id="399" seq="2" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" d="1390318980000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="Conference Room" compNum="0" apptId="400" url="" fb="B" calItemId="400" x_uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" name="fdsafdsafdsafdsafdsafdsa" seq="2" rsvp="0" fba="B" method="PUBLISH" transp="O">
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START"/>
+          </trigger>
+          <desc/>
+        </alarm>
+        <fr>This is a recurring series</fr>
+        <desc>This is a recurring series</desc>
+        <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+        <recur>
+          <add>
+            <rule freq="DAI">
+              <interval ival="1"/>
+              <byday>
+                <wkday day="MO"/>
+                <wkday day="TU"/>
+                <wkday day="WE"/>
+                <wkday day="TH"/>
+                <wkday day="FR"/>
+              </byday>
+            </rule>
+          </add>
+        </recur>
+        <s u="1386597600000" d="20131209T090000" tz="America/New_York"/>
+        <e u="1386599400000" d="20131209T093000" tz="America/New_York"/>
+      </comp>
+    </inv>
+    <inv id="487" recurId="TZID=America/New_York:20131220T090000" seq="2" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ex="1" d="1387396882000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="400" url="" fb="B" calItemId="400" x_uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ridZ="20131220T140000Z" name="fdsafdsafdsafdsafdsafdsa" seq="2" rsvp="0" fba="B" method="PUBLISH" transp="O">
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START"/>
+          </trigger>
+          <desc/>
+        </alarm>
+        <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+        <exceptId d="20131220T090000" tz="America/New_York"/>
+        <s u="1387551600000" d="20131220T100000" tz="America/New_York"/>
+        <e u="1387553400000" d="20131220T103000" tz="America/New_York"/>
+      </comp>
+    </inv>
+    <inv id="546" recurId="TZID=America/New_York:20140123T090000" seq="2" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ex="1" d="1390318957000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="400" url="" fb="B" calItemId="400" x_uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ridZ="20140123T140000Z" name="fdsafdsafdsafdsafdsafdsa" seq="2" rsvp="0" fba="B" method="PUBLISH" transp="O">
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START"/>
+          </trigger>
+          <desc/>
+        </alarm>
+        <fr>This instance occurs at 1PM instead</fr>
+        <desc>This instance occurs at 1PM instead</desc>
+        <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+        <exceptId d="20140123T090000" tz="America/New_York"/>
+        <s u="1390500000000" d="20140123T130000" tz="America/New_York"/>
+        <e u="1390501800000" d="20140123T133000" tz="America/New_York"/>
+      </comp>
+    </inv>
+    <inv id="548" recurId="TZID=America/New_York:20140128T090000" seq="3" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ex="1" d="1390319000000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="400" url="" fb="B" calItemId="400" x_uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ridZ="20140128T140000Z" name="fdsafdsafdsafdsafdsafdsa" seq="3" rsvp="0" fba="B" method="PUBLISH" transp="O">
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START"/>
+          </trigger>
+          <desc/>
+        </alarm>
+        <fr>This is a recurring series with a few exceptions</fr>
+        <desc>This is a recurring series
+
+with a few exceptions</desc>
+        <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+        <exceptId d="20140128T090000" tz="America/New_York"/>
+        <s u="1390928400000" d="20140128T120000" tz="America/New_York"/>
+        <e u="1390930200000" d="20140128T123000" tz="America/New_York"/>
+      </comp>
+    </inv>
+    <inv id="549" recurId="TZID=America/New_York:20140131T090000" seq="3" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ex="1" d="1390321021000" status="CANC" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="400" fb="B" calItemId="400" x_uid="295e69f3-f443-4936-9fc7-0f2719b1b58c" ridZ="20140131T140000Z" name="Cancelled: fdsafdsafdsafdsafdsafdsa" seq="3" rsvp="0" fba="B" method="CANCEL" transp="O">
+        <comment>A single instance of a recurring meeting has been cancelled.</comment>
+        <fr>This is a recurring series</fr>
+        <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+        <exceptId d="20140131T090000" tz="America/New_York"/>
+        <s u="1391176800000" d="20140131T090000" tz="America/New_York"/>
+        <e u="1391178600000" d="20140131T093000" tz="America/New_York"/>
+      </comp>
+    </inv>
+  </appt>
