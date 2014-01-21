@@ -15,7 +15,7 @@ module Zimbra
       end
       
       def find(appointment_id)
-        new AppointmentService.find(appointment_id)
+        new_from_zimbra_attributes(AppointmentService.find(appointment_id))
       end
       
       def new_from_zimbra_attributes(zimbra_attributes)
