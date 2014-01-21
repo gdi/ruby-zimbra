@@ -11,7 +11,7 @@ module Zimbra
     
     class << self
       def find_all_by_calendar_id(calendar_id)
-        AppointmentService.find_all_by_calendar_id(calendar_id).collect { |attrs| new(attrs) }
+        AppointmentService.find_all_by_calendar_id(calendar_id).collect { |attrs| new_from_zimbra_attributes(attrs) }
       end
       
       def find(appointment_id)
