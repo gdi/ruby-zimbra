@@ -52,5 +52,11 @@ describe Zimbra::Appointment::Invite do
     it "should set transparency" do
       @appointment.invites.first.transparency.should == :opaque
     end
+    it "should set start_date_time" do
+      @appointment.invites.first.start_date_time.should == Time.parse("2013-12-09 09:00:00 -0500")
+    end
+    it "should set end_date_time" do
+      @appointment.invites.first.end_date_time.should == Time.parse("2013-12-09 09:30:00 -0500")
+    end
   end
 end

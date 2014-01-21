@@ -70,13 +70,21 @@ module Zimbra
       # take attributes by the xml name or our more descriptive name
       def attributes=(args = {})
         ATTRS.each do |attr_name|
-          self.send(:"#{attr_name}=", (args[attr_name] || args[attr_name.to_s]))
+          if args.has_key?(attr_name)
+            self.send(:"#{attr_name}=", args[attr_name])
+          elsif args.has_key?(attr_name.to_s)
+            self.send(:"#{attr_name}=", args[attr_name.to_s])
+          end
         end
       end
       
       def frequency=(val)
-        frequency = Zimbra::DateHelpers::Frequency.find(val)
+        frequency = Zimbra::DateHelpers::Frequency.find(val).name
         @frequency = frequency || val
+      end
+      
+      def frequency_to_zimbra
+        Zimbra::DateHelpers::Frequency.find(frequency).zimbra_name rescue frequency
       end
       
       def until_date=(val)
@@ -86,7 +94,7 @@ module Zimbra
       def by_day=(val)
         @by_day = if val.is_a?(Array)
           val.collect do |day_specification|
-            day_specification[:day] = Zimbra::DateHelpers::WeekDay.find(day_specification[:day]) || day_specification[:day]
+            day_specification[:day] = Zimbra::DateHelpers::WeekDay.find(day_specification[:day]) rescue day_specification[:day]
             day_specification
           end
         else
@@ -112,6 +120,57 @@ module Zimbra
         hash.reject! { |key, value| options[:except].include?(key.to_sym) || options[:except].include?(key.to_s) } if options[:except]
         hash.reject! { |key, value| !options[:only].include?(key.to_sym) && !options[:only].include?(key.to_s) } if options[:only]
         hash
+      end
+      
+      def create_xml(document)
+        document.add "rule" do |rule_element|
+          rule_element.set_attr "freq", frequency_to_zimbra
+          
+          if until_date
+            rule_element.add "until" do |until_element|
+              until_element.set_attr "d", until_date.utc.strftime("%Y%m%dT%H%M%SZ")
+            end
+          end
+          
+          rule_element.add "interval" do |interval_element|
+            interval_element.set_attr "ival", interval
+          end
+          
+          if count && count > 0
+            rule_element.add "count" do |count_element|
+              count_element.set_attr "num", count
+            end
+          end
+          
+          if by_day && by_day.count > 0
+            rule_element.add "byday" do |by_day_element|
+              by_day.each do |day_spec|
+                by_day_element.add "wkday" do |wkday_element|
+                  wkday_element.set_attr "day", day_spec[:day].zimbra_name
+                  wkday_element.set_attr "ordwk", day_spec[:week_number] if day_spec.has_key?(:week_number)
+                end
+              end
+            end
+          end
+          
+          if by_month && by_month.count > 0
+            rule_element.add "bymonth" do |by_month_element|
+              by_month_element.set_attr "molist", by_month.join(',')
+            end
+          end
+          
+          if by_month_day && by_month_day.count > 0
+            rule_element.add "bymonthday" do |by_month_day_element|
+              by_month_day_element.set_attr "modaylist", by_month_day.join(',')
+            end
+          end
+          
+          if by_set_position
+            rule_element.add "bysetpos" do |bysetpos_element|
+              bysetpos_element.set_attr "poslist", by_set_position.join(',')
+            end
+          end
+        end
       end
     end
   end

@@ -51,18 +51,32 @@ module Zimbra
         hash
       end
       
+      def range_type_to_zimbra
+        possible_range_type_values.find { |k, v| v == range_type }.first rescue range_type
+      end
+      
+      def create_xml(document)
+        document.add "exceptId" do |except_element|
+          except_element.set_attr "d", recurrence_id
+          except_element.set_attr "tz", timezone
+          except_element.set_attr "rangeType", range_type_to_zimbra if range_type
+        end
+      end
+      
       private
       
-      def parse_range_type(val)
-        possible_values = {
+      def possible_range_type_values
+        @possible_range_type_values ||= {
           1 => :none,
           2 => :this_and_future,
           3 => :this_and_prior
         }
-        
+      end
+      
+      def parse_range_type(val)
         int_val = val.to_int rescue nil
         
-        possible_values[int_val] || val
+        possible_range_type_values[int_val] || val
       end
     end
   end

@@ -5,6 +5,47 @@ describe Zimbra::Appointment::RecurRule do
     @xml_api_responses_path = File.join(@fixture_path, 'xml_api_responses', 'recur_rules')
   end
   
+  describe "#create_xml" do
+    @sample_attribute_files = [
+      'second_wednesday_of_every_month.xml',
+      'day_27_of_every_2_months.xml',
+      'every_2_days.xml',
+      'every_3_weeks_on_tuesday_and_friday.xml',
+      'every_day_50_instances.xml',
+      'every_monday_wednesday_friday.xml',
+      'every_tuesday.xml',
+      'every_weekday_with_end_date.xml',
+      'every_year_on_february_2.xml',
+      'first_day_of_every_month.xml',
+      'first_monday_of_every_february.xml',
+      'first_weekend_day_of_every_month.xml',
+      'last_day_of_every_month.xml',
+      'second_day_of_every_2_months.xml'
+    ]
+    
+    @sample_attribute_files.each do |file_name|
+      context file_name do
+        before do
+          @xml = File.read(File.join(@xml_api_responses_path, file_name))
+          @attributes = Zimbra::Hash.from_xml(@xml)
+          @attributes = @attributes[:appt][:inv][:comp][:recur]
+          @recur_rule = Zimbra::Appointment::RecurRule.new_from_zimbra_attributes(@attributes)
+        end
+        
+        it "should match the expected attributes" do
+          document = Handsoap::XmlMason::Document.new do |doc|
+            doc.add "add" do |add_element|
+              @recur_rule.create_xml(add_element)
+            end
+          end
+          
+          parsed_xml = Zimbra::Hash.from_xml(document.to_s)
+          parsed_xml.should == @attributes
+        end
+      end
+    end
+  end
+  
   describe ".new" do
     @sample_attribute_files = {
       'second_wednesday_of_every_month.xml' => {

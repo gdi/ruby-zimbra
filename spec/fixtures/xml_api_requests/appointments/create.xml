@@ -1,0 +1,84 @@
+<?xml version='1.0' ?>
+<CreateAppointmentRequest>
+  <m l="10">
+    <inv allDay="0" loc="Conference Room" status="CONF">
+      <comp class="PUB" fb="B" isOrg="1" name="fdsafdsafdsafdsafdsafdsa" transp="O">
+        <description>This is a recurring series</description>
+        <s u="1386597600000" d="20131209T140000Z" />
+        <e u="1386599400000" d="20131209T143000Z" />
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START" />
+          </trigger>
+        </alarm>
+        <recur>
+          <add>
+            <rule freq="DAI">
+              <interval ival="1" />
+              <byday>
+                <wkday day="MO" />
+                <wkday day="TU" />
+                <wkday day="WE" />
+                <wkday day="TH" />
+                <wkday day="FR" />
+              </byday>
+            </rule>
+          </add>
+        </recur>
+        <or a="mail03@greenviewdata.com" />
+      </comp>
+    </inv>
+    <inv allDay="0" loc="" status="CONF">
+      <comp class="PUB" fb="B" isOrg="1" name="fdsafdsafdsafdsafdsafdsa" transp="O">
+        <s u="1387551600000" d="20131220T150000Z" />
+        <e u="1387553400000" d="20131220T153000Z" />
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START" />
+          </trigger>
+        </alarm>
+        <or a="mail03@greenviewdata.com" />
+        <exceptId d="20131220T090000" tz="America/New_York" />
+      </comp>
+    </inv>
+    <inv allDay="0" loc="" status="CONF">
+      <comp class="PUB" fb="B" isOrg="1" name="fdsafdsafdsafdsafdsafdsa" transp="O">
+        <description>This instance occurs at 1PM instead</description>
+        <s u="1390500000000" d="20140123T180000Z" />
+        <e u="1390501800000" d="20140123T183000Z" />
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START" />
+          </trigger>
+        </alarm>
+        <or a="mail03@greenviewdata.com" />
+        <exceptId d="20140123T090000" tz="America/New_York" />
+      </comp>
+    </inv>
+    <inv allDay="0" loc="" status="CONF">
+      <comp class="PUB" fb="B" isOrg="1" name="fdsafdsafdsafdsafdsafdsa" transp="O">
+        <description>This is a recurring series
+
+with a few exceptions</description>
+        <s u="1390928400000" d="20140128T170000Z" />
+        <e u="1390930200000" d="20140128T173000Z" />
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START" />
+          </trigger>
+        </alarm>
+        <or a="mail03@greenviewdata.com" />
+        <exceptId d="20140128T090000" tz="America/New_York" />
+      </comp>
+    </inv>
+    <inv allDay="0" loc="" status="CANC">
+      <comp class="PUB" fb="B" isOrg="1" name="Cancelled: fdsafdsafdsafdsafdsafdsa" transp="O">
+        <comment>A single instance of a recurring meeting has been cancelled.</comment>
+        <s u="1391176800000" d="20140131T140000Z" />
+        <e u="1391178600000" d="20140131T143000Z" />
+        <or a="mail03@greenviewdata.com" />
+        <exceptId d="20140131T090000" tz="America/New_York" />
+      </comp>
+    </inv>
+  </m>
+</CreateAppointmentRequest>

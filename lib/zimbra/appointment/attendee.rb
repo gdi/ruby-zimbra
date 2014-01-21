@@ -44,6 +44,10 @@ module Zimbra
         @participation_status = parse_participation_status(val)
       end
       
+      def participation_status_to_zimbra
+        possible_participation_status_values.find { |k, v| v == participation_status }.first rescue participiation_status
+      end
+      
       def to_hash(options = {})
         hash = {
           :email_address => email_address,
@@ -56,11 +60,19 @@ module Zimbra
         hash.reject! { |key, value| !options[:only].include?(key.to_sym) && !options[:only].include?(key.to_s) } if options[:only]
         hash
       end
+      
+      def create_xml(document)
+        document.add "at" do |at_element|
+          at_element.set_attr "a", email_address
+          at_element.set_attr "d", friendly_name
+          at_element.set_attr "ptst", participation_status_to_zimbra
+        end
+      end
     
       private
     
-      def parse_participation_status(status)
-        possible_values = {
+      def possible_participation_status_values
+        @possible_participation_status_values ||= {
           'NE' => :needs_action,
           'AC' => :accept,
           'TE' => :tentative,
@@ -71,7 +83,10 @@ module Zimbra
           'WE' => :waiting, 
           'DF' => :deferred
         }
-        possible_values[status] || status
+      end
+    
+      def parse_participation_status(status)
+        possible_participation_status_values[status] || status
       end
     
     end

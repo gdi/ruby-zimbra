@@ -36,7 +36,7 @@ module Zimbra
           :calendar_id               => zimbra_attributes[:appt][:attributes][:l],
           :size                      => zimbra_attributes[:appt][:attributes][:s],
           :replies                   => zimbra_attributes[:appt][:replies],
-          :invites                   => zimbra_attributes[:appt][:inv],
+          :invites_attributes        => zimbra_attributes[:appt][:inv],
           :date                      => zimbra_attributes[:appt][:attributes][:d],
           :loaded_from_search        => zimbra_attributes[:loaded_from_search]
         }
@@ -45,7 +45,7 @@ module Zimbra
     
     ATTRS = [
       :id, :uid, :date, :revision, :size, :calendar_id, 
-      :replies, :invites
+      :replies, :invites, :invites_attributes
     ] unless const_defined?(:ATTRS)
     
     attr_accessor *ATTRS
@@ -88,7 +88,7 @@ module Zimbra
       @invites
     end
     
-    def invites=(invites_attributes)
+    def invites_attributes=(invites_attributes)
       return @invites = nil unless invites_attributes
       
       invites_attributes = invites_attributes.is_a?(Array) ? invites_attributes : [ invites_attributes ]
@@ -101,6 +101,30 @@ module Zimbra
       else
         @date = val
       end
+    end
+    
+    def create_xml(document)
+      document.add "m" do |mime|
+        mime.set_attr "l", calendar_id
+        
+        invites.each do |invite|
+          mime.add "inv" do |invite_element|
+            invite.create_xml(invite_element)
+          end
+        end
+      end
+    end
+    
+    def save
+      if new_record?
+        @id = Zimbra::AppointmentService.create(self)
+      else
+        Zimbra::AppointmentService.update(self)
+      end
+    end
+    
+    def new_record?
+      id.nil?
     end
     
     private
@@ -126,6 +150,17 @@ module Zimbra
       Parser.appointment_response(xml/"//n2:appt")
     end
 
+    def create(appointment)
+      xml = invoke("n2:CreateAppointmentRequest") do |message|
+        Builder.create(message, appointment)
+      end
+      response_hash = Zimbra::Hash.from_xml(xml.document.to_s)
+      response_hash[:Envelope][:Body][:CreateAppointmentResponse][:attributes][:apptId]
+    end
+    
+    def update(appointment)
+    end
+    
     class Builder
       class << self
         def find_all_with_query(message, query)
@@ -135,6 +170,10 @@ module Zimbra
         
         def find_by_id(message, id)
           message.set_attr 'id', id
+        end
+
+        def create(message, appointment)
+          appointment.create_xml(message)
         end
       end
     end

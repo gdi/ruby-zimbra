@@ -10,7 +10,7 @@ describe Zimbra::Appointment do
     end
     
     it "should return all the attributes" do
-      Zimbra::Appointment.parse_zimbra_attributes(@appointment_hash).should == {:id=>518, :uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :revision=>27656, :calendar_id=>10, :size=>0, :replies=>nil, :invites=>{:attributes=>{:id=>517, :seq=>4, :compNum=>0, :type=>"appt"}, :tz=>{:attributes=>{:id=>"America/New_York", :stdoff=>-300, :stdname=>"EST", :dayoff=>-240, :dayname=>"EDT"}, :standard=>{:attributes=>{:wkday=>1, :min=>0, :sec=>0, :mon=>11, :hour=>2, :week=>1}}, :daylight=>{:attributes=>{:wkday=>1, :min=>0, :sec=>0, :mon=>3, :hour=>2, :week=>2}}}, :comp=>{:attributes=>{:uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :d=>1387571704000, :status=>"CONF", :noBlob=>1, :ciFolder=>10, :isOrg=>1, :class=>"PUB", :loc=>"", :compNum=>0, :apptId=>518, :url=>"", :fb=>"B", :calItemId=>518, :x_uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :name=>"Test2222", :seq=>4, :rsvp=>0, :fba=>"B", :method=>"PUBLISH", :transp=>"O"}, :alarm=>{:attributes=>{:action=>"DISPLAY"}, :trigger=>{:rel=>{:attributes=>{:neg=>1, :m=>5, :related=>"START"}}}, :desc=>{}}, :or=>{:attributes=>{:d=>"Mail03", :a=>"mail03@greenviewdata.com", :url=>"mail03@greenviewdata.com"}}, :recur=>{:add=>{:rule=>{:attributes=>{:freq=>"MON"}, :interval=>{:attributes=>{:ival=>1}}, :byday=>{:wkday=>{:attributes=>{:ordwk=>2, :day=>"WE"}}}}}}, :s=>{:attributes=>{:u=>1355340600000, :d=>"20121212T143000", :tz=>"America/New_York"}}, :e=>{:attributes=>{:u=>1355344200000, :d=>"20121212T153000", :tz=>"America/New_York"}}}}, :date=>1387571704000}
+      Zimbra::Appointment.parse_zimbra_attributes(@appointment_hash).should == {:id=>518, :uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :revision=>27656, :calendar_id=>10, :size=>0, :replies=>nil, :invites_attributes=>{:attributes=>{:id=>517, :seq=>4, :compNum=>0, :type=>"appt"}, :tz=>{:attributes=>{:id=>"America/New_York", :stdoff=>-300, :stdname=>"EST", :dayoff=>-240, :dayname=>"EDT"}, :standard=>{:attributes=>{:wkday=>1, :min=>0, :sec=>0, :mon=>11, :hour=>2, :week=>1}}, :daylight=>{:attributes=>{:wkday=>1, :min=>0, :sec=>0, :mon=>3, :hour=>2, :week=>2}}}, :comp=>{:attributes=>{:uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :d=>1387571704000, :status=>"CONF", :noBlob=>1, :ciFolder=>10, :isOrg=>1, :class=>"PUB", :loc=>"", :compNum=>0, :apptId=>518, :url=>"", :fb=>"B", :calItemId=>518, :x_uid=>"1c71d474-5c1f-4048-84e3-9725c0825a44", :name=>"Test2222", :seq=>4, :rsvp=>0, :fba=>"B", :method=>"PUBLISH", :transp=>"O"}, :alarm=>{:attributes=>{:action=>"DISPLAY"}, :trigger=>{:rel=>{:attributes=>{:neg=>1, :m=>5, :related=>"START"}}}, :desc=>{}}, :or=>{:attributes=>{:d=>"Mail03", :a=>"mail03@greenviewdata.com", :url=>"mail03@greenviewdata.com"}}, :recur=>{:add=>{:rule=>{:attributes=>{:freq=>"MON"}, :interval=>{:attributes=>{:ival=>1}}, :byday=>{:wkday=>{:attributes=>{:ordwk=>2, :day=>"WE"}}}}}}, :s=>{:attributes=>{:u=>1355340600000, :d=>"20121212T143000", :tz=>"America/New_York"}}, :e=>{:attributes=>{:u=>1355344200000, :d=>"20121212T153000", :tz=>"America/New_York"}}}}, :date=>1387571704000, :loaded_from_search=>nil}
     end
   end
   
@@ -22,6 +22,25 @@ describe Zimbra::Appointment do
   
     it "should set the recurrence rule" do
       @appointment.invites.first.recurrence_rule.to_hash.should == {:frequency=>:monthly, :interval=>1, :by_day=>[{:day=>:wednesday, :week_number=>2}]}
+    end
+  end
+  
+  describe "#create_xml" do
+    before do
+      @xml_api_responses_path = File.join(@fixture_path, 'xml_api_responses', 'multiple_invites')
+      @appointment = new_appointment_from_xml(File.join(@xml_api_responses_path, 'recurring_with_exceptions.xml'))
+    end
+  
+    it "should return the xml document to create this appointment" do
+      document = Handsoap::XmlMason::Document.new do |doc|
+        doc.add "CreateAppointmentRequest" do |create_appointment_request|
+          @appointment.create_xml(create_appointment_request)
+        end
+      end
+      #File.open(File.join(@fixture_path, 'xml_api_requests', 'appointments', 'create.xml'), 'w') do |io|
+      #  io.write document.to_s
+      #end
+      document.to_s.should == File.read(File.join(@fixture_path, 'xml_api_requests', 'appointments', 'create.xml'))
     end
   end
   

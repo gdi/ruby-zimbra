@@ -36,6 +36,8 @@ module Zimbra
       attr_accessor *ATTRS
     
       def initialize(args = {})
+        @duration_negative = true
+        @when = :start
         self.attributes = args
       end
     
@@ -58,6 +60,21 @@ module Zimbra
         hash.reject! { |key, value| options[:except].include?(key.to_sym) || options[:except].include?(key.to_s) } if options[:except]
         hash.reject! { |key, value| !options[:only].include?(key.to_sym) && !options[:only].include?(key.to_s) } if options[:only]
         hash
+      end
+      
+      def create_xml(document)
+        document.add "trigger" do |trigger_element|
+          trigger_element.add "rel" do |rel_element|
+            rel_element.set_attr "neg", duration_negative ? 1 : 0
+            rel_element.set_attr "w", weeks if weeks && weeks > 0
+            rel_element.set_attr "d", days if days && days > 0
+            rel_element.set_attr "h", hours if hours && hours > 0
+            rel_element.set_attr "m", minutes if minutes && minutes > 0
+            rel_element.set_attr "s", seconds if seconds && seconds > 0
+            rel_element.set_attr "related", self.when.to_s.upcase
+            rel_element.set_attr "count", repeat_count if repeat_count && repeat_count > 0
+          end
+        end
       end
     end
   end
