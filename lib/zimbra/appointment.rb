@@ -25,30 +25,48 @@ module Zimbra
       def parse_zimbra_attributes(zimbra_attributes)
         zimbra_attributes = Zimbra::Hash.symbolize_keys(zimbra_attributes.dup, true)
       
-        {
+        attrs = {}
+        
+        return attrs unless zimbra_attributes.has_key?(:appt) && zimbra_attributes[:appt].has_key?(:attributes)
+        
+        attrs.merge!({
           :id                        => zimbra_attributes[:appt][:attributes][:id],
           :uid                       => zimbra_attributes[:appt][:attributes][:uid],
-          :name                      => zimbra_attributes[:appt][:inv][:comp][:attributes][:name],
+          :revision                  => zimbra_attributes[:appt][:attributes][:rev],
+          :calendar_id               => zimbra_attributes[:appt][:attributes][:l],
+          :size                      => zimbra_attributes[:appt][:attributes][:s],
+          })
+        
+        attrs[:replies] = zimbra_attributes[:appt][:replies] if zimbra_attributes[:appt].has_key?(:replies)
+        
+        return attrs unless zimbra_attributes[:appt].has_key?(:inv) && zimbra_attributes[:appt][:inv].has_key?(:comp)
+        
+        attrs.merge!({
           :fragment                  => zimbra_attributes[:appt][:inv][:comp][:fr],
           :description               => zimbra_attributes[:appt][:inv][:comp][:desc],
           :alarm                     => zimbra_attributes[:appt][:inv][:comp][:alarm],
           :recurrence_rule           => zimbra_attributes[:appt][:inv][:comp][:recur],
-          :attendees                 => zimbra_attributes[:appt][:inv][:comp][:at],
-          :organizer_email_address   => zimbra_attributes[:appt][:inv][:comp][:or][:attributes][:a],
-          :is_organizer              => zimbra_attributes[:appt][:inv][:comp][:attributes][:isOrg],
-          :revision                  => zimbra_attributes[:appt][:attributes][:rev],
+          :attendees                 => zimbra_attributes[:appt][:inv][:comp][:at]
+          })
+        
+        attrs[:organizer_email_address] = zimbra_attributes[:appt][:inv][:comp][:or][:attributes][:a] rescue nil
+        
+        return attrs unless zimbra_attributes[:appt][:inv][:comp].has_key?(:attributes)
+        
+        attrs.merge!({
+          :name                      => zimbra_attributes[:appt][:inv][:comp][:attributes][:name],
           :computed_free_busy_status => zimbra_attributes[:appt][:inv][:comp][:attributes][:fba],
           :free_busy_setting         => zimbra_attributes[:appt][:inv][:comp][:attributes][:fb],
           :date                      => zimbra_attributes[:appt][:inv][:comp][:attributes][:d],
           :invite_status             => zimbra_attributes[:appt][:inv][:comp][:attributes][:status],
-          :all_day                   => zimbra_attributes[:appt][:inv][:comp][:attributes][:allDay] && zimbra_attributes[:appt][:inv][:comp][:attributes][:allDay] == 1 ? true : false,
+          :all_day                   => zimbra_attributes[:appt][:inv][:comp][:attributes][:allDay],
           :visibility                => zimbra_attributes[:appt][:inv][:comp][:attributes][:class],
           :location                  => zimbra_attributes[:appt][:inv][:comp][:attributes][:loc],
-          :calendar_id               => zimbra_attributes[:appt][:attributes][:l],
-          :size                      => zimbra_attributes[:appt][:attributes][:s],
           :transparency              => zimbra_attributes[:appt][:inv][:comp][:attributes][:transp],
-          :replies                   => zimbra_attributes[:appt][:replies]
-        }
+          :is_organizer              => zimbra_attributes[:appt][:inv][:comp][:attributes][:isOrg]
+          })
+          
+        attrs
       end
     end
     
@@ -125,7 +143,21 @@ module Zimbra
       @transparency = parse_transparency_status(val)
     end
     
+    def all_day=(val)
+      @all_day = parse_all_day(val)
+    end
+    
     private
+    
+    def parse_all_day(val)
+      possible_values = {
+        0 => false,
+        1 => true,
+        '0' => false,
+        '1' => true
+      }
+      possible_values[val] || val
+    end
     
     def parse_free_busy_status(fb_status)
       possible_values = {
