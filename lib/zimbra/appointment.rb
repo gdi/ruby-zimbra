@@ -21,7 +21,6 @@ module Zimbra
       end
       
       def new_from_zimbra_attributes(zimbra_attributes)
-        puts "parsing: #{zimbra_attributes.inspect}"
         new(parse_zimbra_attributes(zimbra_attributes))
       end
       
