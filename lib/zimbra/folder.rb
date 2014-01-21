@@ -35,13 +35,17 @@ module Zimbra
   class FolderService < HandsoapAccountService
     def all
       xml = invoke("n2:GetFolderRequest")
-      Parser.get_all_response(xml)
+      parse_xml_responses(xml)
     end
     
     def find_all_by_view(view)
       xml = invoke("n2:GetFolderRequest") do |message|
         Builder.find_all_by_view(message, view)
       end
+      parse_xml_responses(xml)
+    end
+    
+    def parse_xml_responses(xml)
       Parser.get_all_response(xml)
     end
 
@@ -84,7 +88,11 @@ module Zimbra
             attrs[attr_name] = (node/"@#{xml_name}").to_s
             attrs
           end
-          Zimbra::Folder.new(folder_attributes) 
+          initialize_from_attributes(folder_attributes)
+        end
+
+        def initialize_from_attributes(folder_attributes)
+          Zimbra::Folder.new(folder_attributes)
         end
       end
     end

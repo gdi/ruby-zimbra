@@ -1,0 +1,30 @@
+  <appt uid="8c62a78e-f48d-4f5e-8cc8-ba5f621d7ae8" id="261" f="d" rev="4425" d="1390313053000" s="0" l="10">
+    <inv id="260" seq="2" compNum="0" type="appt">
+      <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+        <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+        <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+      </tz>
+      <comp uid="8c62a78e-f48d-4f5e-8cc8-ba5f621d7ae8" d="1390313053000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="Conference Room" compNum="0" apptId="261" url="" fb="B" calItemId="261" draft="1" x_uid="8c62a78e-f48d-4f5e-8cc8-ba5f621d7ae8" name="Test Multiple" seq="2" rsvp="0" fba="B" method="REQUEST" transp="O">
+        <at d="Mail03" a="mail03@greenviewdata.com" rsvp="1" role="REQ" url="mail03@greenviewdata.com" ptst="TE"/>
+        <at d="Test" a="mail04@greenviewdata.com" rsvp="1" role="REQ" url="mail04@greenviewdata.com" ptst="NE"/>
+        <at d="Test" a="mail01b@greenviewdata.com" rsvp="1" role="REQ" url="mail01b@greenviewdata.com" ptst="NE"/>
+        <alarm action="DISPLAY">
+          <trigger>
+            <rel neg="1" m="5" related="START"/>
+          </trigger>
+          <desc/>
+        </alarm>
+        <fr>The following is a new meeting request: Subject: Test Multiple Organizer: "Test" &lt;mail03b@greenviewdata.com> Time: Monday, January 20, 2014, 4:30:00 ...</fr>
+        <desc>The following is a new meeting request:
+
+Subject: Test Multiple</desc>
+        <or d="Test" a="mail03b@greenviewdata.com" url="mail03b@greenviewdata.com"/>
+        <s u="1390253400000" d="20140120T163000" tz="America/New_York"/>
+        <e u="1390255200000" d="20140120T170000" tz="America/New_York"/>
+      </comp>
+    </inv>
+    <replies>
+      <reply d="1390314836000" seq="1" at="mail03@greenviewdata.com" ptst="TE"/>
+      <reply d="1390314836000" seq="1" at="mail04@greenviewdata.com" ptst="TE"/>
+    </replies>
+  </appt>

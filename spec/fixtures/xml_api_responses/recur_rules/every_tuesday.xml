@@ -1,0 +1,29 @@
+<appt uid="1b33102b-6d2e-4d98-ad27-c59a92de9798" id="498" rev="27628" nextAlarm="1387918500000" d="1387472256000" s="0" l="10">
+  <inv id="497" seq="4" compNum="0" type="appt">
+    <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+      <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+      <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+    </tz>
+    <comp uid="1b33102b-6d2e-4d98-ad27-c59a92de9798" d="1387472256000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="498" url="" fb="B" calItemId="498" x_uid="1b33102b-6d2e-4d98-ad27-c59a92de9798" name="RECURTEST" seq="4" rsvp="0" fba="B" method="PUBLISH" transp="O">
+      <alarm action="DISPLAY">
+        <trigger>
+          <rel neg="1" m="5" related="START"/>
+        </trigger>
+        <desc/>
+      </alarm>
+      <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+      <recur>
+        <add>
+          <rule freq="WEE">
+            <interval ival="1"/>
+            <byday>
+              <wkday day="TU"/>
+            </byday>
+          </rule>
+        </add>
+      </recur>
+      <s u="1387918800000" d="20131224T160000" tz="America/New_York"/>
+      <e u="1387922400000" d="20131224T170000" tz="America/New_York"/>
+    </comp>
+  </inv>
+</appt>
