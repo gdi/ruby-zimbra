@@ -2,6 +2,7 @@ module Zimbra
   class Appointment
     class Invite
       ATTRS = [
+        :appointment, 
         :id, :recurrence_id, :sequence_number, 
         
         :start_date_time, :end_date_time, :date,
@@ -24,6 +25,8 @@ module Zimbra
           zimbra_attributes = Zimbra::Hash.symbolize_keys(zimbra_attributes.dup, true)
       
           attrs = {}
+          
+          attrs[:appointment] = zimbra_attributes[:appointment] if zimbra_attributes.has_key?(:appointment)
           
           if zimbra_attributes.has_key?(:attributes)
             attrs.merge!({
@@ -95,6 +98,23 @@ module Zimbra
             self.send(:"#{attr_name}=", args[attr_name.to_s])
           end
         end
+      end
+      
+      def save
+        return false unless appointment
+        
+        if appointment.new_record?
+          appointment.save
+        else
+          Zimbra::AppointmentService.update(appointment, id)
+        end
+      end
+      
+      def cancel
+        return false unless appointment
+        return false if appointment.new_record?
+        
+        Zimbra::AppointmentService.cancel(appointment, id)
       end
       
       def exception=(exception_attributes)
@@ -171,9 +191,11 @@ module Zimbra
       end
       
       def create_xml(document)
+        document.set_attr "id", id if id
         document.set_attr "allDay", all_day ? 1 : 0
         document.set_attr "loc", location if location
         document.set_attr "status", invite_status_to_zimbra if invite_status
+        #document.set_attr "d", date.to_i * 1000 if date
         
         document.add "comp" do |comp|
           comp.set_attr "class", visibility_to_zimbra if visibility
@@ -181,6 +203,7 @@ module Zimbra
           comp.set_attr "isOrg", is_organizer ? 1 : 0
           comp.set_attr "name", name
           comp.set_attr "transp", transparency_to_zimbra if transparency
+          comp.set_attr "d", date.to_i * 1000 if date
           
           if description && !description.empty?
             comp.add "description", description

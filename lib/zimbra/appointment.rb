@@ -66,11 +66,7 @@ module Zimbra
       self.attributes = Zimbra::Appointment.parse_zimbra_attributes(AppointmentService.find(id))
       @loaded_from_search = false
     end
-    
-    def destroy
-      # zmsoap -vv -z -m mail03@greenviewdata.com CancelAppointmentRequest @id="498-497" @comp=0
-    end
-    
+
     def replies
       reload if loaded_from_search
       @replies
@@ -92,7 +88,7 @@ module Zimbra
       return @invites = nil unless invites_attributes
       
       invites_attributes = invites_attributes.is_a?(Array) ? invites_attributes : [ invites_attributes ]
-      @invites = invites_attributes.collect { |attrs| Zimbra::Appointment::Invite.new_from_zimbra_attributes(attrs) }
+      @invites = invites_attributes.collect { |attrs| Zimbra::Appointment::Invite.new_from_zimbra_attributes(attrs.merge( { :appointment => self } )) }
     end
   
     def date=(val)
@@ -103,15 +99,23 @@ module Zimbra
       end
     end
     
-    def create_xml(document)
+    def create_xml(document, invite_id = nil)
       document.add "m" do |mime|
         mime.set_attr "l", calendar_id
         
         invites.each do |invite|
+          next unless invite_id.nil? || invite_id == invite.id
+          
           mime.add "inv" do |invite_element|
             invite.create_xml(invite_element)
           end
         end
+      end
+    end
+
+    def destroy
+      invites.each do |invite|
+        AppointmentService.cancel(self, invite.id)
       end
     end
     
@@ -119,7 +123,9 @@ module Zimbra
       if new_record?
         @id = Zimbra::AppointmentService.create(self)
       else
-        Zimbra::AppointmentService.update(self)
+        invites.each do |invite|
+          Zimbra::AppointmentService.update(self, invite.id)
+        end
       end
     end
     
@@ -158,7 +164,18 @@ module Zimbra
       response_hash[:Envelope][:Body][:CreateAppointmentResponse][:attributes][:apptId]
     end
     
-    def update(appointment)
+    def update(appointment, invite_id)
+      xml = invoke("n2:ModifyAppointmentRequest") do |message|
+        Builder.update(message, appointment, invite_id)
+        
+        puts message.to_s
+      end
+    end
+    
+    def cancel(appointment, invite_id)
+      xml = invoke("n2:CancelAppointmentRequest") do |message|
+        Builder.cancel(message, appointment.id, invite_id)
+      end
     end
     
     class Builder
@@ -174,6 +191,16 @@ module Zimbra
 
         def create(message, appointment)
           appointment.create_xml(message)
+        end
+        
+        def update(message, appointment, invite_id)
+          message.set_attr 'id', "#{appointment.id}-#{invite_id}"
+          appointment.create_xml(message, invite_id)
+        end
+        
+        def cancel(message, appointment_id, invite_id)
+          message.set_attr 'id', "#{appointment_id}-#{invite_id}"
+          message.set_attr 'comp', 0
         end
       end
     end
