@@ -81,7 +81,10 @@ module Zimbra
           'CO' => :completed,
           'IN' => :in_process,
           'WE' => :waiting, 
-          'DF' => :deferred
+          'DF' => :deferred,
+          'New' => :needs_action,
+          'Accepted' => :accept,
+          'Declined' => :declined
         }
       end
     
