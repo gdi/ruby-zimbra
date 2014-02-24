@@ -91,6 +91,13 @@ module Zimbra
         @until_date = Time.parse(val) rescue val
       end
       
+      def by_set_position=(val)
+        if val == [0]
+          @by_set_position = nil
+        else
+          @by_set_position = val
+        end
+      end
       def by_day=(val)
         @by_day = if val.is_a?(Array)
           val.collect do |day_specification|
