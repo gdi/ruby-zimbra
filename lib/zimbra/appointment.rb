@@ -42,7 +42,7 @@ module Zimbra
           :calendar_id               => zimbra_attributes[:appt][:attributes][:l],
           :size                      => zimbra_attributes[:appt][:attributes][:s],
           :replies                   => zimbra_attributes[:appt][:replies],
-          :invites_attributes        => zimbra_attributes[:appt][:inv],
+          :invites_zimbra_attributes => zimbra_attributes[:appt][:inv],
           :date                      => zimbra_attributes[:appt][:attributes][:d],
           :loaded_from_search        => zimbra_attributes[:loaded_from_search]
         }
@@ -51,7 +51,7 @@ module Zimbra
     
     ATTRS = [
       :id, :uid, :date, :revision, :size, :calendar_id, 
-      :replies, :invites, :invites_attributes
+      :replies, :invites, :invites_zimbra_attributes, :invites_attributes
     ] unless const_defined?(:ATTRS)
     
     attr_accessor *ATTRS
@@ -69,7 +69,8 @@ module Zimbra
     end
     
     def reload
-      self.attributes = Zimbra::Appointment.parse_zimbra_attributes(AppointmentService.find(id))
+      raw_attributes = AppointmentService.find(id)
+      self.attributes = Zimbra::Appointment.parse_zimbra_attributes(raw_attributes)
       @loaded_from_search = false
     end
 
@@ -90,11 +91,18 @@ module Zimbra
       @invites
     end
     
-    def invites_attributes=(invites_attributes)
-      return @invites = nil unless invites_attributes
+    def invites_attributes=(attributes)
+      return @invites = nil unless attributes
       
-      invites_attributes = invites_attributes.is_a?(Array) ? invites_attributes : [ invites_attributes ]
-      @invites = invites_attributes.collect { |attrs| Zimbra::Appointment::Invite.new_from_zimbra_attributes(attrs.merge( { :appointment => self } )) }
+      attributes = attributes.is_a?(Array) ? attributes : [ attributes ]
+      @invites = attributes.collect { |attrs| Zimbra::Appointment::Invite.new(attrs.merge( { :appointment => self } )) }
+    end
+    
+    def invites_zimbra_attributes=(attributes)
+      return @invites = nil unless attributes
+      
+      attributes = attributes.is_a?(Array) ? attributes : [ attributes ]
+      @invites = attributes.collect { |attrs| Zimbra::Appointment::Invite.new_from_zimbra_attributes(attrs.merge( { :appointment => self } )) }
     end
   
     def date=(val)
@@ -117,6 +125,8 @@ module Zimbra
           end
         end
       end
+      
+      document
     end
 
     def destroy
