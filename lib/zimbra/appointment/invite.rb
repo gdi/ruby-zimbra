@@ -6,10 +6,11 @@ module Zimbra
         :id, :recurrence_id, :sequence_number, 
         
         :start_date_time, :end_date_time, :date,
-        :name, :fragment, :description, :alarm, :alarm_attributes, :recurrence_rule, :recurrence_rule_attributes, :attendees, 
+        :name, :fragment, :description, :alarm, :alarm_zimbra_attributes, :alarm_attributes, :recurrence_rule, :recurrence_rule_zimbra_attributes, :recurrence_rule_attributes, 
+        :attendees, :attendees_attributes, :attendees_zimbra_attributes, 
         :organizer_email_address, :is_organizer, :computed_free_busy_status,
         :free_busy_setting, :invite_status, :all_day, :visibility, :location, 
-        :transparency, :replies,
+        :transparency, :replies, :never_sent,
         
         :comment, :recurrence_id_utc, :exception
       ] unless const_defined?(:ATTRS)
@@ -40,12 +41,13 @@ module Zimbra
           return attrs unless zimbra_attributes
           
           attrs.merge!({
-            :fragment                   => zimbra_attributes[:fr],
-            :description                => zimbra_attributes[:desc],
-            :comment                    => zimbra_attributes[:comment],
-            :alarm_attributes           => zimbra_attributes[:alarm],
-            :recurrence_rule_attributes => zimbra_attributes[:recur],
-            :attendees                  => zimbra_attributes[:at]
+            :fragment                          => zimbra_attributes[:fr],
+            :description                       => zimbra_attributes[:desc],
+            :comment                           => zimbra_attributes[:comment],
+            :alarm_zimbra_attributes           => zimbra_attributes[:alarm],
+            :recurrence_rule_zimbra_attributes => zimbra_attributes[:recur],
+            :attendees_zimbra_attributes       => zimbra_attributes[:at],
+            :never_sent                        => zimbra_attributes[:neverSent]
             })
       
           if zimbra_attributes[:s]
@@ -123,19 +125,34 @@ module Zimbra
         @exception = Zimbra::Appointment::RecurException.new_from_zimbra_attributes(exception_attributes)
       end
     
-      def recurrence_rule_attributes=(recur_rule_attributes)
-        @recurrence_rule = Zimbra::Appointment::RecurRule.new_from_zimbra_attributes(recur_rule_attributes)
+      def recurrence_rule_attributes=(attributes)
+        @recurrence_rule = attributes ? Zimbra::Appointment::RecurRule.new(attributes) : nil
       end
     
-      def attendees=(attendees_attributes)
-        return @attendees = [] unless attendees_attributes
+      def recurrence_rule_zimbra_attributes=(attributes)
+        @recurrence_rule = attributes ? Zimbra::Appointment::RecurRule.new_from_zimbra_attributes(attributes) : nil
+      end
       
-        attendees_attributes = attendees_attributes.is_a?(Array) ? attendees_attributes : [attendees_attributes]
-        @attendees = attendees_attributes.collect { |attrs| Zimbra::Appointment::Attendee.new_from_zimbra_attributes(attrs[:attributes]) }
+      def attendees_zimbra_attributes=(attributes)
+        return @attendees = [] unless attributes
+      
+        attributes = attributes.is_a?(Array) ? attributes : [attributes]
+        @attendees = attributes.collect { |attrs| Zimbra::Appointment::Attendee.new_from_zimbra_attributes(attrs[:attributes]) }
+      end
+      
+      def attendees_attributes=(attributes)
+        return @attendees = [] unless attributes
+      
+        attributes = attributes.is_a?(Array) ? attributes : [attributes]
+        @attendees = attributes.collect { |attrs| Zimbra::Appointment::Attendee.new(attrs) }
+      end
+      
+      def alarm_attributes=(attributes)
+        @alarm = attributes ? Zimbra::Appointment::Alarm.new(attributes.merge(:appointment_invite => self)) : nil
       end
     
-      def alarm_attributes=(alarm_attributes)
-        @alarm = alarm_attributes ? Zimbra::Appointment::Alarm.new_from_zimbra_attributes(alarm_attributes) : nil
+      def alarm_zimbra_attributes=(attributes)
+        @alarm = attributes ? Zimbra::Appointment::Alarm.new_from_zimbra_attributes(attributes.merge(:appointment_invite => self)) : nil
       end
     
       def computed_free_busy_status=(val)
