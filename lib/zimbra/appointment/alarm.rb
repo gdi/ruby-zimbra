@@ -76,6 +76,25 @@ module Zimbra
           end
         end
       end
+      
+      def date_time_of_alarm
+        return nil if appointment_invite.nil?
+        
+        date_to_calc_from = if self.when == :start
+          appointment_invite.start_date_time
+        else
+          appointment_invite.end_date_time
+        end
+        
+        total_seconds = seconds || 0
+        total_seconds += minutes * 60 if minutes
+        total_seconds += hours * 3600 if hours
+        total_seconds += days * 86400 if days
+        total_seconds += weeks * 86400 * 7 if weeks
+        total_seconds *= -1 if duration_negative
+        
+        date_to_calc_from + total_seconds
+      end
     end
   end
 end
