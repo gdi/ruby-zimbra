@@ -192,12 +192,13 @@ module Zimbra
       
       def create_xml(document)
         document.set_attr "id", id if id
-        document.set_attr "allDay", all_day ? 1 : 0
-        document.set_attr "loc", location if location
         document.set_attr "status", invite_status_to_zimbra if invite_status
+        document.set_attr "isOrg", is_organizer ? 1 : 0
         #document.set_attr "d", date.to_i * 1000 if date
         
         document.add "comp" do |comp|
+          comp.set_attr "loc", location if location
+          comp.set_attr "allDay", all_day ? 1 : 0
           comp.set_attr "class", visibility_to_zimbra if visibility
           comp.set_attr "fb", free_busy_setting_to_zimbra if free_busy_setting
           comp.set_attr "isOrg", is_organizer ? 1 : 0
@@ -205,8 +206,12 @@ module Zimbra
           comp.set_attr "transp", transparency_to_zimbra if transparency
           comp.set_attr "d", date.to_i * 1000 if date
           
+          if is_organizer
+            comp.set_attr "neverSent", never_sent ? 1 : 0
+          end
+          
           if description && !description.empty?
-            comp.add "description", description
+            comp.add "desc", description
           end
           
           if comment && !comment.empty?
