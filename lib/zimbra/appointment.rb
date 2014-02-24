@@ -153,6 +153,7 @@ module Zimbra
       xml = invoke("n2:GetAppointmentRequest") do |message|
         Builder.find_by_id(message, appointment_id)
       end
+      return nil unless xml
       Parser.appointment_response(xml/"//n2:appt")
     end
 
