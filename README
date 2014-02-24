@@ -12,3 +12,6 @@ dl.admin_group = true
 dl.save
 
 Zimbra.account_login('user@example.com')
+
+calendar = Zimbra::Calendar.all.first
+appointment = calendar.appointments.first
