@@ -137,7 +137,9 @@ module Zimbra
     
     def save
       if new_record?
-        @id = Zimbra::AppointmentService.create(self)
+        response = Zimbra::AppointmentService.create(self)
+        invites.first.id = response[:invite_id]
+        @id = response[:id]
       else
         invites.each do |invite|
           Zimbra::AppointmentService.update(self, invite.id)
@@ -149,6 +151,9 @@ module Zimbra
       id.nil?
     end
     
+    def id_with_invite_id
+      "#{id}-#{invites.first.id}"
+    end
     
     def last_instance_time
       instance_times = Zimbra::AppointmentService.find_all_instances_of_an_appointment(self)
@@ -215,8 +220,6 @@ module Zimbra
     def update(appointment, invite_id)
       xml = invoke("n2:ModifyAppointmentRequest") do |message|
         Builder.update(message, appointment, invite_id)
-        
-        puts message.to_s
       end
     end
     
