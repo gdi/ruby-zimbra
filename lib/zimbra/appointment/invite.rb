@@ -281,6 +281,7 @@ module Zimbra
       end
       
       def parse_all_day(val)
+        return val if val == true || val == false
         possible_all_day_values[val.to_i] || val
       end
     
