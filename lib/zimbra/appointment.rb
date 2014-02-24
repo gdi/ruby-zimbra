@@ -16,6 +16,10 @@ module Zimbra
         AppointmentService.find_all_by_calendar_id(calendar_id).collect { |attrs| new_from_zimbra_attributes(attrs.merge(:loaded_from_search => true)) }
       end
       
+      def find_all_by_calendar_id_since(calendar_id, since_date)
+        AppointmentService.find_all_by_calendar_id_since(calendar_id, since_date).collect { |attrs| new_from_zimbra_attributes(attrs.merge(:loaded_from_search => true)) }
+      end
+      
       def find(appointment_id)
         new_from_zimbra_attributes(AppointmentService.find(appointment_id))
       end
@@ -170,6 +174,13 @@ module Zimbra
       instances = appt_hash[:inst].is_a?(Array) ? appt_hash[:inst] : [appt_hash[:inst]]
       instances.collect { |inst| Time.at(inst[:attributes][:s] / 1000) }
     end
+    
+    def find_all_by_calendar_id_since(calendar_id, since_date)
+      xml = invoke("n2:SearchRequest") do |message|
+        Builder.find_all_with_query(message, "inid:#{calendar_id} AND date:>#{since_date.to_i}")
+      end
+      Parser.get_search_response(xml)
+   end
     
     def find(appointment_id)
       xml = invoke("n2:GetAppointmentRequest") do |message|
