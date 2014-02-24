@@ -22,6 +22,7 @@ module Zimbra
       xml = invoke("n2:DelegateAuthRequest") do |message|
         Builder.get_by_account_name(message, account_name)
       end
+      return nil unless xml
       Parser.delegate_auth_token_response(account_name, xml)
     end
     
