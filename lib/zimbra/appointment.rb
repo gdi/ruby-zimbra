@@ -161,7 +161,9 @@ module Zimbra
         Builder.create(message, appointment)
       end
       response_hash = Zimbra::Hash.from_xml(xml.document.to_s)
-      response_hash[:Envelope][:Body][:CreateAppointmentResponse][:attributes][:apptId]
+      id = response_hash[:Envelope][:Body][:CreateAppointmentResponse][:attributes][:apptId] rescue nil
+      invite_id = response_hash[:Envelope][:Body][:CreateAppointmentResponse][:attributes][:invId].gsub(/#{id}\-/, '').to_i rescue nil
+      { :id => id, :invite_id => invite_id }
     end
     
     def update(appointment, invite_id)
