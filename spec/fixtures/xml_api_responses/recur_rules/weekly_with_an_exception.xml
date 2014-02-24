@@ -1,0 +1,44 @@
+<appt uid="1c71d474-5c1f-4048-84e3-9725c0825a44" id="518" rev="27644" nextAlarm="1388087700000" d="1387483796000" s="0" l="10">
+  <inv id="517" seq="0" compNum="0" type="appt">
+    <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+      <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+      <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+    </tz>
+    <comp uid="1c71d474-5c1f-4048-84e3-9725c0825a44" d="1387483787000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="518" url="" fb="B" calItemId="518" x_uid="1c71d474-5c1f-4048-84e3-9725c0825a44" name="Test" seq="0" rsvp="0" fba="B" method="PUBLISH" transp="O">
+      <alarm action="DISPLAY">
+        <trigger>
+          <rel neg="1" m="5" related="START"/>
+        </trigger>
+        <desc/>
+      </alarm>
+      <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+      <recur>
+        <add>
+          <rule freq="WEE">
+            <interval ival="1"/>
+          </rule>
+        </add>
+      </recur>
+      <s u="1387481400000" d="20131219T143000" tz="America/New_York"/>
+      <e u="1387485000000" d="20131219T153000" tz="America/New_York"/>
+    </comp>
+  </inv>
+  <inv id="519" recurId="TZID=America/New_York:20131226T143000" seq="1" compNum="0" type="appt">
+    <tz id="America/New_York" stdoff="-300" stdname="EST" dayoff="-240" dayname="EDT">
+      <standard wkday="1" min="0" sec="0" mon="11" hour="2" week="1"/>
+      <daylight wkday="1" min="0" sec="0" mon="3" hour="2" week="2"/>
+    </tz>
+    <comp uid="1c71d474-5c1f-4048-84e3-9725c0825a44" ex="1" d="1387483796000" status="CONF" noBlob="1" ciFolder="10" isOrg="1" class="PUB" loc="" compNum="0" apptId="518" url="" fb="B" calItemId="518" x_uid="1c71d474-5c1f-4048-84e3-9725c0825a44" ridZ="20131226T193000Z" name="Test" seq="1" rsvp="0" fba="B" method="PUBLISH" transp="O">
+      <alarm action="DISPLAY">
+        <trigger>
+          <rel neg="1" m="5" related="START"/>
+        </trigger>
+        <desc/>
+      </alarm>
+      <or d="Mail03" a="mail03@greenviewdata.com" url="mail03@greenviewdata.com"/>
+      <exceptId d="20131226T143000" tz="America/New_York"/>
+      <s u="1388088000000" d="20131226T150000" tz="America/New_York"/>
+      <e u="1388091600000" d="20131226T160000" tz="America/New_York"/>
+    </comp>
+  </inv>
+</appt>

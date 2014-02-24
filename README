@@ -1,7 +1,8 @@
 EXAMPLE USAGE
 =============
 
-Zimbra.url = 'http://example.com:7071/soap/service'
+Zimbra.admin_api_url = 'https://mail.server.test:7071/service/admin/soap'
+Zimbra.account_api_url = 'https://mail.server.test/service/soap'
 Zimbra.login('admin@example.com','secret')
 
 d = Zimbra::Domain.create('luser.com')
@@ -10,4 +11,4 @@ dl = Zimbra::DistributionList.create('info@luser.com')
 dl.admin_group = true
 dl.save
 
-
+Zimbra.account_login('user@example.com')

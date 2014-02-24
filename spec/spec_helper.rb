@@ -15,3 +15,18 @@ def zimbra_soap_doc(xml)
 </soap:Envelope>
 XML
 end
+
+def new_appointment_from_xml(xml_path)
+  xml = File.read(xml_path)
+  appointment_hash = Zimbra::Hash.from_xml(xml)
+  Zimbra::Appointment.new_from_zimbra_attributes(appointment_hash)
+end
+
+RSpec.configure do |config|
+
+  config.before(:each) do
+    @fixture_path = File.join(File.dirname(File.expand_path(__FILE__)), 'fixtures')
+  end
+  
+end
+
