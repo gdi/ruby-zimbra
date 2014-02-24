@@ -67,13 +67,14 @@ module Zimbra
 
     # re-log into the zimbra SOAP service
     def reset_login(username, password)
-      puts "Logging into zimbra as #{username}"
       @@auth_token = Auth.login(username, password)
     end
     
     def account_login(username)
       delegate_auth_token = DelegateAuthToken.for_account_name(username)
+      return false unless delegate_auth_token
       @@account_auth_token = delegate_auth_token.token
+      true
     end
   end
 end
