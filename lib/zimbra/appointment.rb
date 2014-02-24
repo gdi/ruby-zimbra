@@ -133,6 +133,13 @@ module Zimbra
       id.nil?
     end
     
+    
+    def last_instance_time
+      instance_times = Zimbra::AppointmentService.find_all_instances_of_an_appointment(self)
+      return nil unless instance_times && instance_times.count > 0
+      instance_times.max
+    end
+    
     private
     
     def parse_date_in_seconds(seconds)
@@ -147,6 +154,21 @@ module Zimbra
         Builder.find_all_with_query(message, "inid:#{calendar_id}")
       end
       Parser.get_search_response(xml)
+    end
+    
+    def find_all_instances_of_an_appointment(appointment)
+      xml = invoke("n2:SearchRequest") do |message|
+        message.set_attr 'query', "date:#{appointment.date.to_i * 1000}"
+        message.set_attr 'types', 'appointment'
+        message.set_attr 'calExpandInstStart', '1'
+        message.set_attr 'calExpandInstEnd', (Time.now + (86400 * 365 * 10)).to_i * 1000
+      end
+      response_hash = Zimbra::Hash.from_xml(xml.document.to_s)
+      response_hash = response_hash[:Envelope][:Body][:SearchResponse]
+      appointments = response_hash[:appt].is_a?(Array) ? response_hash[:appt] : [response_hash[:appt]]
+      appt_hash = appointments.find { |appt| appt[:attributes][:id] == appointment.id }
+      instances = appt_hash[:inst].is_a?(Array) ? appt_hash[:inst] : [appt_hash[:inst]]
+      instances.collect { |inst| Time.at(inst[:attributes][:s] / 1000) }
     end
     
     def find(appointment_id)
