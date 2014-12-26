@@ -88,7 +88,6 @@ module Zimbra
           attributes.each do |k,v|
             A.inject(message, k, v)
           end
-          p message
         end
 
         def get_by_id(message, id)
