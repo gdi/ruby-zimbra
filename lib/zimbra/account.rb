@@ -49,6 +49,10 @@ module Zimbra
     def delete
       AccountService.delete(self)
     end
+
+    def add_alias(alias_name)
+      AccountService.add_alias(self,alias_name)
+    end
   end
 
   class AccountService < HandsoapService
@@ -93,6 +97,12 @@ module Zimbra
       end
     end
 
+    def add_alias(account,alias_name)
+      xml = invoke('n2:AddAccountAliasRequest') do |message|
+        Builder.add_alias(message,account.id,alias_name)
+      end
+    end
+
     class Builder
       class << self
         def create(message, account)
@@ -134,6 +144,11 @@ module Zimbra
 
         def delete(message, id)
           message.add 'id', id
+        end
+
+        def add_alias(message,id,alias_name)
+          message.add 'id', id
+          message.add 'alias', alias_name
         end
       end
     end
