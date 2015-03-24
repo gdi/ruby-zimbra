@@ -2,7 +2,7 @@ module Zimbra
   class ACL
     class TargetObjectNotFound < StandardError; end
 
-    TARGET_CLASSES = [Zimbra::Domain, Zimbra::DistributionList, Zimbra::Cos]
+    TARGET_CLASSES = [Zimbra::Domain, Zimbra::DistributionList, Zimbra::Cos, Zimbra::Account]
     TARGET_MAPPINGS = TARGET_CLASSES.inject({}) do |hsh, klass|
       hsh[klass.acl_name] = klass
       hsh[klass] = klass.acl_name
@@ -51,7 +51,7 @@ module Zimbra
     def to_zimbra_acl_value
       id = target_id
       type = target_class.acl_name
-      "#{id} #{type} #{name}" 
+      "#{id} #{type} #{name}"
     end
 
     def apply(xmldoc)

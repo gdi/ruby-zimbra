@@ -19,7 +19,7 @@ module Zimbra
       end
 
       def acl_name
-        'account'
+        'usr'
       end
     end
 
