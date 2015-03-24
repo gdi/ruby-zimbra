@@ -46,7 +46,7 @@ module Zimbra
     end
 
     def admin_group=(val)
-      @admin_group = Zimbra::Boolean.read(val) 
+      @admin_group = Zimbra::Boolean.read(val)
     end
     def admin_group?
       @admin_group
@@ -54,6 +54,10 @@ module Zimbra
 
     def delete
       DistributionListService.delete(self)
+    end
+
+    def add_alias(alias_name)
+      DistributionListService.add_alias(self,alias_name)
     end
 
     def save
@@ -97,7 +101,7 @@ module Zimbra
       Parser.distribution_list_response(xml/'//n2:dl')
 
       modify_members(dist)
-    end 
+    end
 
     def modify_members(distribution_list)
       distribution_list.new_members.each do |member|
@@ -123,6 +127,12 @@ module Zimbra
     def delete(dist)
       xml = invoke("n2:DeleteDistributionListRequest") do |message|
         Builder.delete(message, dist.id)
+      end
+    end
+
+    def add_alias(distribution_list,alias_name)
+      xml = invoke('n2:AddDistributionListAliasRequest') do |message|
+        Builder.add_alias(message,distribution_list.id,alias_name)
       end
     end
 
@@ -180,6 +190,11 @@ module Zimbra
 
         def delete(message, id)
           message.add 'id', id
+        end
+
+        def add_alias(message,id,alias_name)
+          message.add 'id', id
+          message.add 'alias', alias_name
         end
       end
     end
