@@ -14,7 +14,7 @@ module Zimbra
       end
 
       def create(name, attributes = {})
-        DomainService.create(name, attributes) 
+        DomainService.create(name, attributes)
       end
 
       def acl_name
@@ -25,7 +25,7 @@ module Zimbra
     attr_accessor :id, :name, :acls
 
     def initialize(id, name, acls = [])
-      self.id = id 
+      self.id = id
       self.name = name
       self.acls = acls || []
     end
@@ -38,7 +38,7 @@ module Zimbra
       DomainService.delete(self)
     end
   end
-  
+
   class DomainService < HandsoapService
     def all
       xml = invoke("n2:GetAllDomainsRequest")
@@ -47,7 +47,7 @@ module Zimbra
 
     def create(name, attributes = {})
       xml = invoke("n2:CreateDomainRequest") do |message|
-        Builder.create(message, name)
+        Builder.create(message, name, attributes)
       end
       Parser.domain_response(xml/"//n2:domain")
     end
@@ -73,7 +73,7 @@ module Zimbra
         Builder.modify(message, domain)
       end
       Parser.domain_response(xml/'//n2:domain')
-    end 
+    end
 
     def delete(dist)
       xml = invoke("n2:DeleteDomainRequest") do |message|
@@ -83,10 +83,13 @@ module Zimbra
 
     class Builder
       class << self
-        def create(message, name)
+        def create(message, name, attributes = {})
           message.add 'name', name
+          attributes.each do |k,v|
+            A.inject(message, k, v)
+          end
         end
-        
+
         def get_by_id(message, id)
           message.add 'domain', id do |c|
             c.set_attr 'by', 'id'
@@ -130,7 +133,7 @@ module Zimbra
           id = (node/'@id').to_s
           name = (node/'@name').to_s
           acls = Zimbra::ACL.read(node)
-          Zimbra::Domain.new(id, name, acls) 
+          Zimbra::Domain.new(id, name, acls)
         end
       end
     end
