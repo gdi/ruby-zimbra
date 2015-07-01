@@ -107,7 +107,7 @@ module Zimbra
       class << self
         def create(message, account)
           message.add 'name', account.name
-          message.add 'password', account.password
+          message.add 'password', account.password if account.password
           A.inject(message, 'zimbraCOSId', account.cos_id)
           account.attributes.each do |k,v|
             A.inject(message, k, v)
